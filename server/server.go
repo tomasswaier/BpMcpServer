@@ -11,10 +11,6 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
-func Meow() {
-	fmt.Println("meow")
-}
-
 type Input struct {
 	Name string `json:"nothing" jsonschema:"actually no input is needed"`
 }
@@ -22,6 +18,7 @@ type Output struct {
 	Answer string `json:"word" jsonschema:"tells magic word to the user"`
 }
 
+// This function was a test to get familiar with mcp communication
 func magicWord(ctx context.Context, req *mcp.CallToolRequest, input Input) (
 	*mcp.CallToolResult,
 	any,
@@ -36,6 +33,7 @@ func magicWord(ctx context.Context, req *mcp.CallToolRequest, input Input) (
 		Output{Answer: "Osciloponosiousis"},
 		nil
 }
+//not working function which will later be used for real communication
 func getPersonInfo(ctx context.Context, req *mcp.CallToolRequest, input Input) (
 	*mcp.CallToolResult,
 	any,
