@@ -1,48 +1,37 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 type Input struct {
-	Name string `json:"nothing" jsonschema:"actually no input is needed"`
+	NumberPlate string `json:"numberplate" jsonschema:"needs a numberplate from the user"`
 }
+type CarNumberPlate struct {
+	NumberPlate string `json:"numberplate"`
+}
+
 type Output struct {
 	Answer string `json:"word" jsonschema:"tells magic word to the user"`
 }
 
-// This function was a test to get familiar with mcp communication
-func magicWord(ctx context.Context, req *mcp.CallToolRequest, input Input) (
-	*mcp.CallToolResult,
-	any,
-	error,
-) {
-
-	return &mcp.CallToolResult{
-			Content: []mcp.Content{
-				&mcp.TextContent{Text: "Osciloponosiousis"},
-			},
-		},
-		Output{Answer: "Osciloponosiousis"},
-		nil
-}
-//not working function which will later be used for real communication
 func getPersonInfo(ctx context.Context, req *mcp.CallToolRequest, input Input) (
 	*mcp.CallToolResult,
 	any,
 	error,
 ) {
-
+	result := apiTest(input)
 	return &mcp.CallToolResult{
 			Content: []mcp.Content{
-				&mcp.TextContent{Text: "Osciloponosiousis"},
+				&mcp.TextContent{Text: string(result)},
 			},
 		},
 		Output{Answer: "Osciloponosiousis"},
@@ -51,39 +40,57 @@ func getPersonInfo(ctx context.Context, req *mcp.CallToolRequest, input Input) (
 }
 
 func InitServer() {
-	server := mcp.NewServer(&mcp.Implementation{Name: "MagicWordTeller", Version: "v1.0.0"}, nil)
-	mcp.AddTool(server, &mcp.Tool{
-		Name:        "MagicWordTeller",
-		Description: "Tells user secret magic word",
-	}, magicWord)
+	server := mcp.NewServer(&mcp.Implementation{Name: "Card database", Version: "v1.0.0"}, nil)
+	//mcp.AddTool(server, &mcp.Tool{
+	//	Name:        "MagicWordTeller",
+	//	Description: "Tells user secret magic word",
+	//}, magicWord)
 
-	/*mcp.AddTool(server, &mcp.Tool{
-		Name:        "Person Database",
-		Description: "Retrives info about someone from database of people including their secret text!",
+	mcp.AddTool(server, &mcp.Tool{
+		Name:        "Car Database",
+		Description: "Retrives name and phone number of someone",
 	}, getPersonInfo)
-	*/
 
 	if err := server.Run(context.Background(), &mcp.StdioTransport{}); err != nil {
 		log.Fatal(err)
 	}
 
 }
-
-func apiTest() {
-	response, err := http.Get("http://localhost:8000")
-
-	if err != nil {
-		fmt.Print(err.Error())
-		os.Exit(1)
+func apiTest(input Input) []byte {
+	url := "http://localhost:8000/api/carPage"
+	car := CarNumberPlate{
+		NumberPlate: input.NumberPlate,
 	}
-	err:= json.NewDecoder(response.Body).
+
+	jsonData, err := json.Marshal(car)
 	if err != nil {
 		log.Fatal(err)
+		return nil
 	}
-	fmt.Println(string(json.Unmarshaler(responseData)))
+	resp, err := http.Post(url, "application/json", bytes.NewReader(jsonData))
+	if err != nil {
+		log.Fatal(err)
+		return []byte("Something went wrong")
+	} else {
+		defer resp.Body.Close()
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+			return nil
+		}
+		var data []map[string]any
+		if err := json.Unmarshal(body, &data); err != nil {
+			return nil
+		}
+		pretty, _ := json.MarshalIndent(data, "", "  ")
+		fmt.Println(pretty)
+		return pretty
+
+	}
 }
 
 func main() {
-	apiTest()
-	InitServer()
+	testInput := Input{NumberPlate: "Sk132Sk"}
+	apiTest(testInput)
+	//InitServer()
 }
