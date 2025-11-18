@@ -12,51 +12,52 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
-type Input struct {
-	NumberPlate string `json:"numberplate" jsonschema:"needs a numberplate from the user"`
-}
 type CarNumberPlate struct {
-	NumberPlate string `json:"numberplate"`
+	NumberPlate string
+}
+
+type ApiResponse struct {
+	NumberPlate string
+	Name        string
+	Phone       string
 }
 
 type Output struct {
-	Answer string `json:"word" jsonschema:"tells magic word to the user"`
+	Name        string `json:"name" jsonschema:"Person who currently uses car with that numberplate"`
+	PhoneNumber string `json:"phone" jsonschema:"Phone number of person with that numberplate"`
 }
 
-func getPersonInfo(ctx context.Context, req *mcp.CallToolRequest, input Input) (
+func getPersonInfo(ctx context.Context, req *mcp.CallToolRequest, input CarNumberPlate) (
 	*mcp.CallToolResult,
 	any,
 	error,
 ) {
-	result := apiTest(input)
+	result, err := apiTest(input)
+	if err != nil {
+		return &mcp.CallToolResult{}, nil, err
+	}
+	output := Output{Name: result.Name, PhoneNumber: result.Phone}
+
 	return &mcp.CallToolResult{
-			Content: []mcp.Content{
-				&mcp.TextContent{Text: string(result)},
-			},
+		Content: []mcp.Content{
+			&mcp.TextContent{Text: fmt.Sprintf("Name: %s, Phone: %s", result.Name, result.Phone)},
 		},
-		Output{Answer: "Osciloponosiousis"},
-		nil
+	}, output, nil
 
 }
 
 func InitServer() {
-	server := mcp.NewServer(&mcp.Implementation{Name: "Card database", Version: "v1.0.0"}, nil)
-	//mcp.AddTool(server, &mcp.Tool{
-	//	Name:        "MagicWordTeller",
-	//	Description: "Tells user secret magic word",
-	//}, magicWord)
-
+	server := mcp.NewServer(&mcp.Implementation{Name: "Car database server"}, nil)
 	mcp.AddTool(server, &mcp.Tool{
-		Name:        "Car Database",
-		Description: "Retrives name and phone number of someone",
+		Name:        "search_by_numberplate",
+		Description: "Retrives name and phone number of owner of a car if you have their numberplate",
 	}, getPersonInfo)
 
 	if err := server.Run(context.Background(), &mcp.StdioTransport{}); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
-
 }
-func apiTest(input Input) []byte {
+func apiTest(input CarNumberPlate) (ApiResponse, error) {
 	url := "http://localhost:8000/api/carPage"
 	car := CarNumberPlate{
 		NumberPlate: input.NumberPlate,
@@ -64,33 +65,31 @@ func apiTest(input Input) []byte {
 
 	jsonData, err := json.Marshal(car)
 	if err != nil {
-		log.Fatal(err)
-		return nil
+		log.Println(err)
+		return ApiResponse{}, err
 	}
 	resp, err := http.Post(url, "application/json", bytes.NewReader(jsonData))
 	if err != nil {
-		log.Fatal(err)
-		return []byte("Something went wrong")
+		log.Println(err)
+		return ApiResponse{}, err
 	} else {
 		defer resp.Body.Close()
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
-			log.Fatal(err)
-			return nil
+			log.Println(err)
+			return ApiResponse{}, err
 		}
-		var data []map[string]any
+		var data ApiResponse
 		if err := json.Unmarshal(body, &data); err != nil {
-			return nil
+			return ApiResponse{}, err
 		}
-		pretty, _ := json.MarshalIndent(data, "", "  ")
-		fmt.Println(pretty)
-		return pretty
+		return data, nil
 
 	}
 }
 
 func main() {
-	testInput := Input{NumberPlate: "Sk132Sk"}
-	apiTest(testInput)
-	//InitServer()
+	//testInput := CarNumberPlate{NumberPlate: "Sk132Sk"}
+	//apiTest(testInput)
+	InitServer()
 }
