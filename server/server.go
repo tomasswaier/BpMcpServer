@@ -90,6 +90,6 @@ func apiTest(input CarNumberPlate) (ApiResponse, error) {
 
 func main() {
 	//testInput := CarNumberPlate{NumberPlate: "Sk132Sk"}
-	//apiTest(testInput)
+	//fmt.Println(apiTest(testInput))
 	InitServer()
 }
