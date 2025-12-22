@@ -103,20 +103,24 @@ something like Although the present stage of the work is not yet published, the 
 
 = Long term maintainablity:
 Maintainability is the process providing maintanance for a product. It is one of the most critical quality attributes of any large scale application and is directly correlated to early design decisions and overall code quality. Statistics suggest that developers working on complex software may spend up to 39% of their time on maintanance related activities including bug fixing, refactoring and adapting the system to new requirements(2). In the context of this project ,maintainability is the ease with which future developers can understand ,update or modify the extended Adversea application after it's transformation into an mcp communication capable system. To improve long term maintainablity of this project and to reduce the time needed in the future for maintanance tasks, the development approach will follow already present structure of the project. Furthermore application developed will utilize docker for development ,testing and deployment which will provide consistent and reproducible environment. Containerization will ensure that enviromental inconsistencies which often introduce major source of maintanance issues are eliminated, therfore simplifying long term support.
-The Machine Context protocol while highly promising is still considered relatively new and changing standard. These changes introduce issues often not seen in api based systems. Research into maintanance of mcp projects highlights that implementations have similar code smell and bug pattern as traditional software engineering domain where up to 66% of MCP projects have code smell and 14.4% have bugs (3). Tackling issue of maintainablity is not simple in this case as older version of a package may lead improper functionality of the mcp server. 
 
+The Machine Context protocol while highly promising is still considered relatively new and changing standard. These changes introduce issues often not seen in api based systems. Research into maintanance of mcp projects highlights that implementations have similar code smell and bug pattern as traditional software engineering domain where up to 66% of MCP projects have code smell and 14.4% have bugs (3). Tackling issue of maintainablity is not simple in this case as older version of a package may lead improper functionality of the mcp server. 
 
 To lessen these risks the project follows best practices which ensure architectural stability, dependency control, documentation and reproducibility. From architectural perspective the mcp functionality is isolated into clearly defined modules that communicate with the rest of the application trough internal interface. This separation reduces compexity between core business logic and protocol specific components, making it easier for developers to replace or update libraries without requiring large changes to the project. Usage of modularity is especially important given the likelyhood of future changes to mcp specifications. 
 
-Dependancy management also plays a key role in ensuring long term sustainability. All newly introduced dependancies are version pinned to prevent unintended updates from breaking the system. Additionally all dependancy updates are treated as deliberate maintanance tasks rather than automatic upgrades. This approach allows maintainer to have more oversight on changes in MCP sdk or gateway implementations before installing them in production environment. Combined with docker based builds this strategy ensures previous versions of the project can always be rebuilt and analyzed if an error occures.
+Dependancy management also plays a key role in ensuring long term sustainability. All newly introduced dependancies are version pinned to prevent unintended updates from breaking the system. Additionally all dependancy updates are treated as deliberate maintanance tasks rather than automatic upgrades. This approach allows maintainer to have more oversight on changes in MCP sdk or gateway implementations before installing them in production environment. Combined with docker based builds this strategy ensures previous versions of the project can always be rebuilt and analyzed if an error occures. 
 
---Steps taken in order to reduce this outcome are focused on architectural stability, dependency control, documentation, and reproducibility of the development environment. 
+Given to the projects size documentation is essential for long term maintainability. Documentation follows standard introduced in the rest of the project in the .md format and will contain the most neccessary information for application setup and understanding. 
 
---mention how the project will be sustainable in long term, documentation and other things 
+In summary, the long term maintainability in this project is achived trough a combination fo modular architectural design, strict dependancy management, comprehensive documentation and reproducibe environment.
 
+= Employability:
+Ai is the one of the biggest industries ... something something 
+Problem this project aims to resolve is one which is quite common in the market. With most projects whith similar paid api interface not having mcp integration I hope to gain knowledge and experience needed in professional field which will improve my career in the it field. 
+-- i hope to make the world better something something
+-- programming something something ?
+-- professional environment something something ?
 
-
-= Zamestnateľnosť:
 
 
 
